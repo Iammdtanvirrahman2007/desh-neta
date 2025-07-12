@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>দেশনেতার চাঁদা</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #121212;
+      color: #ffffff;
+      padding: 20px;
+    }
+    .container {
+      background: #1e1e1e;
+      padding: 25px;
+      border-radius: 15px;
+      max-width: 700px;
+      margin: auto;
+      box-shadow: 0 0 20px rgba(255, 168, 0, 0.2);
+    }
+    h2 {
+      text-align: center;
+      color: #ff9800;
+      font-size: 30px;
+      margin-bottom: 20px;
+    }
+    label {
+      font-size: 16px;
+    }
+    input {
+      background: #2a2a2a;
+      color: #ffffff;
+      border: 1px solid #555;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      width: 100%;
+      font-size: 16px;
+    }
+    button {
+      background: #ff9800;
+      color: #121212;
+      border: none;
+      padding: 12px;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      width: 100%;
+    }
+    button:hover {
+      background: #e68900;
+    }
+    #result {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 20px;
+      font-size: 18px;
+    }
+    #comment {
+      text-align: center;
+      font-style: italic;
+      margin-top: 15px;
+      color: #aaa;
+    }
+    .charts {
+      margin-top: 30px;
+    }
+    canvas {
+      margin: 20px auto;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>দেশনেতার চাঁদা ক্যালকুলেটর</h2>
+    <label for="incomeInput">আপনার মাসিক আয় (৳):</label>
+    <input type="number" id="incomeInput" placeholder="উদাহরণ: ২০০০০">
+    <button onclick="calculateBreakdown()">হিসাব করুন</button>
+    <div id="result"></div>
+    <div id="comment"></div>
+    <div class="charts">
+      <canvas id="chadaPieChart"></canvas>
+      <canvas id="chadaBarChart"></canvas>
+    </div>
+  </div>
+
+  <script>
+    let pieChart, barChart;
+
+    function calculateBreakdown() {
+      const income = parseFloat(document.getElementById("incomeInput").value);
+      const resultDiv = document.getElementById("result");
+      const commentDiv = document.getElementById("comment");
+
+      if (isNaN(income) || income <= 0) {
+        resultDiv.innerText = 'দয়া করে একটি বৈধ পরিমাণ লিখুন।';
+        commentDiv.innerText = '';
+        return;
+      }
+
+      const chada = income * 0.1;
+      const leader = chada * 0.6;
+      const activist = chada * 0.3;
+      const posters = chada * 0.1;
+
+      resultDiv.innerHTML = `
+        মোট চাঁদা (১০%): <strong>৳${chada.toFixed(2)}</strong><br>
+        ➤ নেতার পকেটে: ৳${leader.toFixed(2)}<br>
+        ➤ কর্মীদের জন্য: ৳${activist.toFixed(2)}<br>
+        ➤ পোস্টার/লিফলেট: ৳${posters.toFixed(2)}
+      `;
+
+      let comment = '';
+      if (income <= 10000) {
+        comment = 'এই বেতনে চাঁদা চাইলে একবার ভাবুন... নাকি গালিই খাবেন?';
+      } else if (income <= 20000) {
+        comment = 'দেশের সেবায় আপনার এই সামান্য অবদান সম্মানজনক!';
+      } else if (income <= 30000) {
+        comment = 'জনগণের সেবায় আপনার চাঁদা প্রশংসনীয়।';
+      } else {
+        comment = 'বাহ! আপনি তো VIP চাঁদাদাতা! নেতা খুশি!';
+      }
+      commentDiv.innerText = comment;
+
+      const labels = ['নেতার পকেটে', 'কর্মীদের জন্য', 'পোস্টার/লিফলেট'];
+      const data = [leader, activist, posters];
+      const colors = ['#ff5722', '#03a9f4', '#ffc107'];
+
+      const pieCtx = document.getElementById('chadaPieChart').getContext('2d');
+      if (pieChart) pieChart.destroy();
+      pieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+          labels: labels,
+          datasets: [{ data: data, backgroundColor: colors }]
+        },
+        options: {
+          plugins: {
+            legend: { labels: { color: 'white' } }
+          }
+        }
+      });
+
+      const barCtx = document.getElementById('chadaBarChart').getContext('2d');
+      if (barChart) barChart.destroy();
+      barChart = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: '৳ টাকায় অংশ',
+            data: data,
+            backgroundColor: colors
+          }]
+        },
+        options: {
+          scales: {
+            x: { ticks: { color: 'white' } },
+            y: {
+              beginAtZero: true,
+              ticks: { color: 'white' }
+            }
+          },
+          plugins: {
+            legend: { labels: { color: 'white' } }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
